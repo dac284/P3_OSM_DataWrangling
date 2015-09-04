@@ -1,0 +1,32 @@
+This file contains some of the queries run against the OSM data in text form. 
+The queries were pasted into a mongo shell and run
+
+db.SDT.find().count()
+db.SDT.distinct("created.uid").length
+db.SDT.find({'type' : 'node'}).count()
+db.SDT.find({'type' : 'way'}).count()
+
+db.SDT.aggregate([{"$group" :
+	 			{"_id" : "$created.user", 
+	 			 "count" : {"$sum" : 1}}},
+	 		  {"$sort" : {"count" : -1}},
+	 		  {"$limit" : 1}])
+	 		  
+	 		  
+db.SDT.aggregate([{"$group" : {"_id" : "$created.user", "count" : {"$sum" : 1}}}, {"$sort" : {"count" : -1}}, {"$limit" : 1}])
+
+db.SDT.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$group":{"_id":"$count", "num_users":{"$sum":1}}}, {"$sort":{"_id":1}}, {"$limit":1}])
+
+db.SDT.aggregate([{"$match":{"amenity":{"$exists":1}}}, {"$group":{"_id":"$amenity", "count":{"$sum":1}}}, {"$sort":{"count":­1}}, {"$limit":3}])
+
+db.SDT.find({"gnis" : {"$exists":1}}).count()
+
+db.SDT.aggregate([{"$match":{"address.street": {"$exists":1}}}, {"$group":{"_id" : "$address.street", "count":{"$sum":1}}}, {"$sort":{"count":-1}}, {"$limit":5}])
+
+db.SDT.aggregate([{"$match":{"amenity": {"$exists":1}}}, {"$group":{"_id" : "$amenity", "count":{"$sum":1}}}, {"$sort":{"count":-1}}, {"$limit":10}])
+
+db.SDT.find({"amenity" : "brewery"}).count()
+
+db.SDT.find({"amenity" : "bar"}).pretty()
+
+db.SDT.aggregate([{"$match":{"amenity": {"$exists":1}, "amenity":"restaurant"}}, {"$group":{"_id" : "$cuisine", "count":{"$sum":1}}}, {"$sort":{"count":-1}}, {"$limit":10}])
